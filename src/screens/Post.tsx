@@ -1,11 +1,12 @@
 import { ActivityIndicator, FlatList, Image, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { useNavigation } from '@react-navigation/native';
 
 
 //intergface
 interface PropsPost {
    // userId: number,
-   // Id: number,
+   Id: number,
    title: string,
    body: string
 }
@@ -28,15 +29,35 @@ const App = () => {
    //page
    const [startIndex, setStartIndex] = useState(0);
    const itemsPerPage = 5;
+   //navi
+   const navigation = useNavigation();
+
+
+
+
    //renderItem post
    const _itemPost = ({ item, index }: { item: PropsPost, index: number }) => {
+
+      const handleBookmark = (postId: number) => {
+         console.log("Bookmark clicked for item with ID:", postId);
+         // Implement your bookmark logic here
+      };
       return (
          <TouchableOpacity
             style={[styles.containerPost,
             selectedItemIndex === index ? { backgroundColor: 'green' } : null]}
-            onPress={() => setSelectedItemIndex(index)}>
+            onPress={() => {
+               setSelectedItemIndex(index); // Lưu ID của item được chọn
+               console.log(selectedItemIndex);
+
+            }}>
             <Text style={styles.txtTtile}> Title: {item.title}</Text>
             <Text style={styles.txtTtile}> Body: {item.body}</Text>
+            <Pressable
+               onPress={() => handleBookmark(item.Id)}
+            >
+               <Text style={[styles.txtTtile, { textAlign: 'center' }]}> Bookmark </Text>
+            </Pressable>
          </TouchableOpacity>
       )
    }
@@ -68,7 +89,6 @@ const App = () => {
       });
       setPosts(filteredData);
       console.log("resul: ", filteredData);
-
    };
    //fillter
    const handleSortAZ = () => {
@@ -102,6 +122,10 @@ const App = () => {
    }, [posts]);
 
 
+
+   const handleBookmark = () => {
+      navigation.navigate("Bookmark" as never)
+   };
    return (
       <View style={styles.container}>
          {isLoading ? (
@@ -109,6 +133,11 @@ const App = () => {
          ) : (
             <>
                <Text style={styles.txtPost}>Post List</Text>
+               <Pressable onPress={handleBookmark}>
+                  <Text style={styles.txtPost}>Bookmark</Text>
+
+               </Pressable>
+
                <View style={styles.inputContainer}>
                   <Image
                      style={styles.iconSeach}
@@ -139,10 +168,6 @@ const App = () => {
                />
             </>
          )}
-
-
-
-
       </View>
    )
 }
@@ -198,7 +223,7 @@ const styles = StyleSheet.create({
    containerPost: {
       marginBottom: 16,
       width: '100%',
-      height: 200,
+      height: 220,
       borderRadius: 32,
       backgroundColor: 'white',
       paddingHorizontal: 12
